@@ -1,6 +1,15 @@
 using UPPE
 using Test
+using UnPack
+
+using PhysicalConstants.CODATA2018
+const C0 = SpeedOfLightInVacuum.val
+
+cd(@__DIR__)
 
 @testset "UPPE.jl" begin
-    # Write your tests here.
+    include("test_t.jl")
+    include("test_rt.jl")
 end
+
+rm("results", recursive=true)
