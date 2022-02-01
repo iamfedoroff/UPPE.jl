@@ -178,7 +178,7 @@ end
 
 
 function write_field(field::FieldRT, group, dset)
-    group[dset, shuffle=(), compress=9] = real.(collect(field.E))
+    group[dset, shuffle=true, deflate=9] = real.(collect(field.E))
     return nothing
 end
 
