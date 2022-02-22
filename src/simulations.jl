@@ -13,13 +13,14 @@ end
 
 function Simulation(
     model, n2, N0;
-    prefix="", dz0, dzout=dz0, phimax=pi/100, Icrit=Inf,
+    prefix="", dz0, dzout=dz0, phimax=pi/100, Icrit=Inf, alg=RK4(),
 )
     @unpack grid, field, response, zu, z = model
 
     # integrator:
     # use initial J=0 as initial condition to avoid creating dummy array
-    q_integ = Integrator(q_func!, response.J, (model,))
+    q_prob = ODEIntegrators.Problem(q_func!, response.J, (model,))
+    q_integ = ODEIntegrators.Integrator(q_prob, alg)
 
     analyzer = FieldAnalyzer(grid, z)
 
@@ -65,7 +66,7 @@ function run!(simulation)
 
         time2frequency!(field.E, field.FFT)
         if nonlinearity
-            @timeit "Q step" rk4step!(q_integ, field.E, z, dz)
+            @timeit "Q step" ODEIntegrators.step!(q_integ, field.E, z, dz)
         end
         @timeit "K step" K_step!(field, model.KK, dz)
         frequency2time!(field.E, field.FFT)

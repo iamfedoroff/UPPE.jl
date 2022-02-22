@@ -6,15 +6,16 @@ export CPU, GPU, adapt_array,
        refractive_index, k_func, chi3_func, group_velocity, diffraction_length,
        dispersion_length,
        Response, Model,
-       Simulation, run!
+       Simulation, run!,
+       RK2, RK3, RK4, Tsit5, ATsit5   # ODEIntegrators algorithms
 
-using Adapt: @adapt_structure
 using AnalyticSignals: rsig2asig!, rsig2aspec!
 using CUDA: CuVector, CuMatrix, CuArray, @cuda, launch_configuration,
             threadIdx, blockIdx, blockDim, gridDim
 using FFTW: fftfreq, plan_fft!
 using HankelTransforms: dhtcoord, dhtfreq, plan_dht
 using HDF5
+using ODEIntegrators
 using Printf: @printf, @sprintf
 using TimerOutputs: @timeit, reset_timer!, get_defaulttimer
 using UnPack: @unpack
@@ -43,7 +44,6 @@ include("fields.jl")
 include("medium.jl")
 include("guards.jl")
 include("models.jl")
-include("integrators.jl")
 include("field_analyzers.jl")
 include("outputs.jl")
 include("simulations.jl")
