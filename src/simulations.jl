@@ -24,7 +24,7 @@ function Simulation(
 
     analyzer = FieldAnalyzer(grid, z)
 
-    output = Output(grid, field, analyzer, N0, zu, z, dzout; prefix)
+    output = Output(grid, field, N0, zu, z, dzout; prefix)
 
     phik = phi_kerr(field, n2, zu)
     phip = phi_plasma(field, N0, zu)

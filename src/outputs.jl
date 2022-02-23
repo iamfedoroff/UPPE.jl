@@ -121,6 +121,8 @@ mutable struct OutputBIN{T}
     iout :: Int
     zout :: T
     dzout :: T
+    zdata :: Bool
+    izdata :: Int
 end
 
 
@@ -129,6 +131,7 @@ end
 # ------------------------------------------------------------------------------
 function OutputBIN(fname::String, grid::GridT{T}, zu, z, dzout) where T
     @unpack tu, t = grid
+
     fp = HDF5.h5open(fname, "w")
     group = HDF5.create_group(fp, "units")
     group["t"] = tu
@@ -141,7 +144,9 @@ function OutputBIN(fname::String, grid::GridT{T}, zu, z, dzout) where T
     iout = 1
     zout = z
 
-    return OutputBIN{T}(fname, iout, zout, dzout)
+    zdata = false
+    izdata = 1
+    return OutputBIN{T}(fname, iout, zout, dzout, zdata, izdata)
 end
 
 
@@ -155,7 +160,8 @@ end
 # BIN RT
 # ------------------------------------------------------------------------------
 function OutputBIN(fname::String, grid::GridRT{T}, zu, z, dzout) where T
-    @unpack ru, tu, r, t = grid
+    @unpack Nr, ru, tu, r, t = grid
+
     fp = HDF5.h5open(fname, "w")
     group = HDF5.create_group(fp, "units")
     group["r"] = ru
@@ -165,15 +171,17 @@ function OutputBIN(fname::String, grid::GridRT{T}, zu, z, dzout) where T
     group["r"] = r
     group["t"] = collect(t)
     group = HDF5.create_group(fp, "field")
-    # group = HDF5.create_group(fp, "zdata")
-    # create_dataset(group, "z", T, ((1,), (-1,)))
-    # create_dataset(group, "Fzr", T, ((1, Nr), (-1, Nr)))
+    group = HDF5.create_group(fp, "zdata")
+    create_dataset(group, "z", T, ((1,), (-1,)), chunk=(100,))
+    create_dataset(group, "Fr", T, ((1,Nr), (-1,Nr)), chunk=(100,Nr))
     HDF5.close(fp)
 
     iout = 1
     zout = z
 
-    return OutputBIN{T}(fname, iout, zout, dzout)
+    zdata = true
+    izdata = 1
+    return OutputBIN{T}(fname, iout, zout, dzout, zdata, izdata)
 end
 
 
@@ -183,10 +191,23 @@ function write_field(field::FieldRT, group, dset)
 end
 
 
+function write_zdata(analyzer::FieldAnalyzerRT, group, iz)
+    data = group["z"]
+    HDF5.set_extent_dims(data, (iz,))
+    data[iz] = analyzer.z
+
+    data = group["Fr"]
+    HDF5.set_extent_dims(data, (iz, length(analyzer.Fr)))
+    data[iz, :] = analyzer.Fr
+    return nothing
+end
+
+
+
 # ------------------------------------------------------------------------------
 # BIN tools
 # ------------------------------------------------------------------------------
-function write_bin(out::OutputBIN, field::Field, z)
+function write_bin(out::OutputBIN, field::Field, analyzer::FieldAnalyzer, z)
     if z >= out.zout
         dset = @sprintf("%03d", out.iout)
         @printf("Writing dataset %s...\n", dset)
@@ -199,6 +220,15 @@ function write_bin(out::OutputBIN, field::Field, z)
 
         out.iout = out.iout + 1
         out.zout = out.zout + out.dzout
+    end
+
+    if out.zdata
+        fp = HDF5.h5open(out.fname, "r+")
+        group = fp["zdata"]
+        write_zdata(analyzer, group, out.izdata)
+        HDF5.close(fp)
+
+        out.izdata = out.izdata + 1
     end
     return nothing
 end
@@ -215,7 +245,7 @@ end
 
 
 function Output(
-    grid::Grid, field::Field, analyzer::FieldAnalyzer, neu, zu, z, dzout;
+    grid::Grid, field::Field, neu, zu, z, dzout;
     prefix::String="",
 )
     if dirname(prefix) != ""
@@ -234,6 +264,6 @@ end
 
 function write_output(out::Output, field::Field, analyzer::FieldAnalyzer, z)
     write_txt(out.txt, analyzer)
-    write_bin(out.bin, field, z)
+    write_bin(out.bin, field, analyzer, z)
     return nothing
 end
