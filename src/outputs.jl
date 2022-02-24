@@ -160,7 +160,8 @@ end
 # BIN RT
 # ------------------------------------------------------------------------------
 function OutputBIN(fname::String, grid::GridRT{T}, zu, z, dzout) where T
-    @unpack Nr, ru, tu, r, t = grid
+    @unpack Nr, Nt, ru, tu, r, t = grid
+    Nwr = iseven(Nt) ? div(Nt, 2) : div(Nt+1, 2)
 
     fp = HDF5.h5open(fname, "w")
     group = HDF5.create_group(fp, "units")
@@ -174,6 +175,7 @@ function OutputBIN(fname::String, grid::GridRT{T}, zu, z, dzout) where T
     group = HDF5.create_group(fp, "zdata")
     create_dataset(group, "z", T, ((1,), (-1,)), chunk=(100,))
     create_dataset(group, "Fr", T, ((1,Nr), (-1,Nr)), chunk=(100,Nr))
+    create_dataset(group, "Si", T, ((1,Nwr+1), (-1,Nwr+1)), chunk=(100,Nwr+1))
     HDF5.close(fp)
 
     iout = 1
@@ -198,7 +200,13 @@ function write_zdata(analyzer::FieldAnalyzerRT, group, iz)
 
     data = group["Fr"]
     HDF5.set_extent_dims(data, (iz, length(analyzer.Fr)))
-    data[iz, :] = analyzer.Fr
+    data[iz, :] = collect(analyzer.Fr)
+
+    data = group["Si"]
+    Nt = length(analyzer.Si)
+    Nwr = iseven(Nt) ? div(Nt, 2) : div(Nt+1, 2)
+    HDF5.set_extent_dims(data, (iz, Nwr+1))
+    data[iz, :] = collect(analyzer.Si)[Nwr:end]
     return nothing
 end
 

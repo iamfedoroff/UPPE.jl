@@ -44,8 +44,8 @@ function Field(grid::GridRT{T}, w0, E; Eu=1, Iu=1) where T
     E = Array{Complex{T}}(E)
     E = adapt_array(arch, E)
 
-    Nthalf = iseven(Nt) ? div(Nt, 2) : div(Nt+1, 2)
-    region = (Nr, Nthalf)
+    Nwr = iseven(Nt) ? div(Nt, 2) : div(Nt+1, 2)
+    region = (Nr, Nwr)
     DHT = plan_dht(rmax, E; region=region, save=false)
 
     FFT = plan_fft!(E, [2])

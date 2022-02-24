@@ -60,6 +60,7 @@ mutable struct FieldAnalyzerRT{T} <: FieldAnalyzer
     rdr :: AbstractVector{T}
     Fr :: AbstractVector{T}
     Ft :: AbstractVector{T}
+    Si :: AbstractVector{T}
 end
 
 
@@ -69,7 +70,8 @@ function FieldAnalyzer(grid::GridRT{T}, z) where T
     rdr = adapt_array(arch, r .* dr)
     Fr = adapt_array(arch, zeros(Nr))
     Ft = adapt_array(arch, zeros(Nt))
-    return FieldAnalyzerRT{T}(z, Imax, nemax, rad, tau, W, rdr, Fr, Ft)
+    Si = adapt_array(arch, zeros(Nt))
+    return FieldAnalyzerRT{T}(z, Imax, nemax, rad, tau, W, rdr, Fr, Ft, Si)
 end
 
 
@@ -80,6 +82,11 @@ function analyze!(analyzer::FieldAnalyzerRT, grid, field, response, z)
 
     analyzer.Fr .= vec(sum(abs2, E, dims=2)) * dt
     analyzer.Ft .= 2 * pi * vec(sum(abs2.(E) .* analyzer.rdr, dims=1))
+
+    field.FFT \ field.E   # time -> frequency [exp(-i*w*t)]
+    analyzer.Si .= 2 * pi * grid.dt * grid.Nt *
+                   ifftshift(vec(sum(abs2.(field.E) .* analyzer.rdr, dims=1)))
+    field.FFT * field.E   # frequency -> time [exp(-i*w*t)]
 
     analyzer.z = z
     analyzer.Imax = maximum(abs2, E)

@@ -12,7 +12,7 @@ export CPU, GPU, adapt_array,
 using AnalyticSignals: rsig2asig!, rsig2aspec!
 using CUDA: CuVector, CuMatrix, CuArray, @cuda, launch_configuration,
             threadIdx, blockIdx, blockDim, gridDim
-using FFTW: fftfreq, plan_fft!
+using FFTW: fftfreq, ifftshift, plan_fft!
 using HankelTransforms: dhtcoord, dhtfreq, plan_dht
 using HDF5
 using ODEIntegrators
