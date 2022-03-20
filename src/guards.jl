@@ -23,13 +23,13 @@ function Guard(grid::GridT{T}, field) where T
 end
 
 
-function apply_guard_real_domain!(E::AbstractVector, guard::GuardT) where T
+function apply_guard_real_domain!(E::AbstractVector, guard::GuardT)
     @. E = E * guard.T
     return nothing
 end
 
 
-function apply_guard_spec_domain!(E::AbstractVector, guard::GuardT) where T
+function apply_guard_spec_domain!(E::AbstractVector, guard::GuardT)
     @. E = E * guard.W
     return nothing
 end
@@ -74,14 +74,14 @@ function Guard(grid::GridRT{T}, field) where T
 end
 
 
-function apply_guard_real_domain!(E::AbstractMatrix, guard::GuardRT) where T
+function apply_guard_real_domain!(E::AbstractMatrix, guard::GuardRT)
     guard_mul!(E, guard.R; dim=1)
     guard_mul!(E, guard.T; dim=2)
     return nothing
 end
 
 
-function apply_guard_spec_domain!(E::AbstractMatrix, guard::GuardRT) where T
+function apply_guard_spec_domain!(E::AbstractMatrix, guard::GuardRT)
     @. E = E * guard.K
     guard_mul!(E, guard.W; dim=2)
     return nothing
