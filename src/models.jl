@@ -43,13 +43,11 @@ function Model(
     guard = Guard(grid, field)
 
     # Linear propagator:
-    kparaxial = true
     KK = KKpropagator(grid, field, zu; paraxial=kparaxial)
     KK = adapt_array(arch, KK)
     apply_guard_spec_domain!(KK, guard)
 
     # Nonlinear propagator:
-    qparaxial = true
     QQ = QQpropagator(grid, field, zu; paraxial=qparaxial)
     QQ = adapt_array(arch, QQ)
     apply_guard_spec_domain!(QQ, guard)
