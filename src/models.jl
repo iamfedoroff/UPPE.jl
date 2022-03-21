@@ -92,8 +92,10 @@ function KKpropagator(grid::GridT{T}, field, zu; paraxial=true) where T
     vf = group_velocity(w0)   # frame velocity
     KK = zeros(ComplexF64, Nt)   # Float64 for higher precision
     for it=1:Nt
-        KK[it] = KKfunc(0, w[it] * wu; paraxial) * zu
-        KK[it] = KK[it] - (w[it] * wu) / vf * zu
+        if w[it] > 0
+            KK[it] = KKfunc(0, w[it] * wu; paraxial) * zu
+            KK[it] = KK[it] - (w[it] * wu) / vf * zu
+        end
     end
     return Array{Complex{T}}(KK)
 end
@@ -105,10 +107,12 @@ function KKpropagator(grid::GridRT{T}, field, zu; paraxial=true) where T
     vf = group_velocity(w0)   # frame velocity
     KK = zeros(ComplexF64, (Nr, Nt))   # Float64 for higher precision
     for it=1:Nt
-    for ir=1:Nr
-        KK[ir,it] = KKfunc(k[ir]*ku, w[it]*wu; paraxial)
-        KK[ir,it] = (KK[ir,it] - (w[it] * wu) / vf) * zu
-    end
+        if w[it] > 0
+            for ir=1:Nr
+                KK[ir,it] = KKfunc(k[ir]*ku, w[it]*wu; paraxial)
+                KK[ir,it] = (KK[ir,it] - (w[it] * wu) / vf) * zu
+            end
+        end
     end
     return Array{Complex{T}}(KK)
 end
@@ -140,7 +144,9 @@ function QQpropagator(grid::GridT{T}, field, zu; paraxial=true) where T
     @unpack Eu, w0 = field
     QQ = zeros(ComplexF64, Nt)   # Float64 for higher precision
     for it=1:Nt
-        QQ[it] = QQfunc(0, w[it] * wu; paraxial) * zu / Eu
+        if w[it] > 0
+            QQ[it] = QQfunc(0, w[it] * wu; paraxial) * zu / Eu
+        end
     end
     return Array{Complex{T}}(QQ)
 end
@@ -151,9 +157,11 @@ function QQpropagator(grid::GridRT{T}, field, zu; paraxial=true) where T
     @unpack Eu, w0 = field
     QQ = zeros(ComplexF64, (Nr, Nt))   # Float64 for higher precision
     for it=1:Nt
-    for ir=1:Nr
-        QQ[ir,it] = QQfunc(k[ir]*ku, w[it]*wu; paraxial) * zu / Eu
-    end
+        if w[it] > 0
+            for ir=1:Nr
+                QQ[ir,it] = QQfunc(k[ir]*ku, w[it]*wu; paraxial) * zu / Eu
+            end
+        end
     end
     return Array{Complex{T}}(QQ)
 end
