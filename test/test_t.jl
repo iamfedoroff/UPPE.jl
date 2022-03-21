@@ -36,6 +36,7 @@ model = Model(
     zu = 1,   # [m] unit of space in z direction
     z = 0,   # [m] initial propagation distance
     zmax = 21,   # [zu] propagation distance
+    kparaxial = true,
     nonlinearity = false,
 )
 
