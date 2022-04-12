@@ -34,18 +34,20 @@ function GridT(
 end
 
 
-# function show(io::IO, g::GridT{T}) where T
-#     str =
-#     """
-#     GridT{$T}:
-#         Nt = $(g.Nt) - resolution in t
-#         tu = $(fmt(g.tu)) [s] - unit of t
-#       tmin = $(fmt(g.tmin)) [tu] - left boundary of t domain
-#       tmax = $(fmt(g.tmax)) [tu] - right boundary of t domain
-#         dt = $(fmt(g.dt)) [tu] - t step
-#     """
-#     print(io, str)
-# end
+function info(g::GridT{T}) where T
+    str =
+    """
+    GridT{$T}:
+        Nt = $(g.Nt) - resolution in t
+        tu = $(g.tu) [s] - unit of t
+      tmin = $(g.tmin) [tu] - left boundary of t domain
+      tmax = $(g.tmax) [tu] - right boundary of t domain
+        dt = $(g.dt) [tu] - t step
+    tguard = $(g.tguard)
+    wguard = $(g.wguard)
+    """
+    return str
+end
 
 
 # ******************************************************************************
@@ -96,6 +98,33 @@ function GridRT(
         arch, Nr, Nt, ru, tu, ku, wu, rmax, tmin, tmax, r, t, k, w, dr, dt,
         rguard, tguard, kguard, wguard,
     )
+end
+
+
+function info(g::GridRT{T}) where T
+    dr_min = minimum(diff(g.r)) * g.ru
+    dr_max = maximum(diff(g.r)) * g.ru
+    dr_avg = sum(diff(g.r)) / length(diff(g.r)) * g.ru
+    str =
+    """
+    GridRT{$T}:
+        Nr = $(g.Nr) - resolution in r
+        ru = $(g.ru) [m] - unit of r
+      rmax = $(g.rmax) [ru] - domain in r
+    dr_min = $(dr_min) [m] - minimum r step
+    dr_avg = $(dr_avg) [m] - average r step
+    dr_max = $(dr_max) [m] - maximum r step
+    rguard = $(g.rguard) [ru]
+    kguard = $(g.kguard) [deg]
+        Nt = $(g.Nt) - resolution in t
+        tu = $(g.tu) [s] - unit of t
+      tmin = $(g.tmin) [tu] - left boundary of t domain
+      tmax = $(g.tmax) [tu] - right boundary of t domain
+        dt = $(g.dt) [tu] - t step
+    tguard = $(g.tguard) [tu]
+    wguard = $(g.wguard) [1/s]
+    """
+    return str
 end
 
 
