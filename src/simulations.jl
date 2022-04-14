@@ -15,7 +15,7 @@ function Simulation(
     model, n2, N0;
     prefix="", dz0, dzout=dz0, phimax=pi/100, Icrit=Inf, alg=RK4(),
 )
-    @unpack grid, field, response, zu, z = model
+    (; grid, field, response, zu, z) = model
 
     # integrator:
     # use initial J=0 as initial condition to avoid creating dummy array
@@ -41,9 +41,9 @@ end
 
 
 function run!(simulation)
-    @unpack model, q_integ, analyzer, output = simulation
-    @unpack dz0, phik, phip, phimax, Icrit = simulation
-    @unpack grid, field, response, z, zmax, nonlinearity = model
+    (; model, q_integ, analyzer, output) = simulation
+    (; dz0, phik, phip, phimax, Icrit) = simulation
+    (; grid, field, response, z, zmax, nonlinearity) = model
 
     # calculate response to find the initial electron density:
     if nonlinearity
@@ -108,7 +108,7 @@ end
 
 
 function phi_kerr(field, n2, zu)
-    @unpack w0, Eu = field
+    (; w0, Eu) = field
 
     mu = permeability(w0)
     k0 = k_func(w0)
@@ -121,7 +121,7 @@ end
 
 
 function phi_plasma(field, neu, zu)
-    @unpack w0, Eu = field
+    (; w0, Eu) = field
 
     mu = permeability(w0)
     k0 = k_func(w0)

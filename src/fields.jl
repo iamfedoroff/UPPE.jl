@@ -14,7 +14,7 @@ end
 
 
 function Field(grid::GridT{T}, w0, E; Eu=1, Iu=1) where T
-    @unpack arch = grid
+    (; arch) = grid
 
     E = Array{Complex{T}}(E)
     E = adapt_array(arch, E)
@@ -39,7 +39,7 @@ end
 
 
 function Field(grid::GridRT{T}, w0, E; Eu=1, Iu=1) where T
-    @unpack arch, Nr, Nt, rmax = grid
+    (; arch, Nr, Nt, rmax) = grid
 
     E = Array{Complex{T}}(E)
     E = adapt_array(arch, E)

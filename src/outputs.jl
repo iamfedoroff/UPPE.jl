@@ -17,8 +17,8 @@ end
 # TXT T
 # ------------------------------------------------------------------------------
 function OutputTXT(fname::String, grid::GridT, field::FieldT, neu, zu)
-    @unpack tu = grid
-    @unpack Iu = field
+    (; tu) = grid
+    (; Iu) = field
     plotvars = (
         PlotVar("z", "m", zu),
         PlotVar("Imax", "W/m^2", Iu),
@@ -32,7 +32,7 @@ end
 
 
 function write_txt(out::OutputTXT, analyzer::FieldAnalyzerT)
-    @unpack z, Imax, nemax, tau, F = analyzer
+    (; z, Imax, nemax, tau, F) = analyzer
     fp = open(out.fname, "a")
     write(fp, "  ")
     @printf(fp, "%18.12e ", z)
@@ -50,8 +50,8 @@ end
 # TXT RT
 # ------------------------------------------------------------------------------
 function OutputTXT(fname::String, grid::GridRT, field::FieldRT, neu, zu)
-    @unpack ru, tu = grid
-    @unpack Iu = field
+    (; ru, tu) = grid
+    (; Iu) = field
     plotvars = (
         PlotVar("z", "m", zu),
         PlotVar("Imax", "W/m^2", Iu),
@@ -66,7 +66,7 @@ end
 
 
 function write_txt(out::OutputTXT, analyzer::FieldAnalyzerRT)
-    @unpack z, Imax, nemax, rad, tau, W = analyzer
+    (; z, Imax, nemax, rad, tau, W) = analyzer
     fp = open(out.fname, "a")
     write(fp, "  ")
     @printf(fp, "%18.12e ", z)
@@ -130,7 +130,7 @@ end
 # BIN T
 # ------------------------------------------------------------------------------
 function OutputBIN(fname::String, grid::GridT{T}, zu, z, dzout) where T
-    @unpack tu, t = grid
+    (; tu, t) = grid
 
     fp = HDF5.h5open(fname, "w")
     group = HDF5.create_group(fp, "units")
@@ -160,7 +160,7 @@ end
 # BIN RT
 # ------------------------------------------------------------------------------
 function OutputBIN(fname::String, grid::GridRT{T}, zu, z, dzout) where T
-    @unpack Nr, Nt, ru, tu, r, t = grid
+    (; Nr, Nt, ru, tu, r, t) = grid
     Nwr = iseven(Nt) ? div(Nt, 2) : div(Nt+1, 2)
 
     fp = HDF5.h5open(fname, "w")

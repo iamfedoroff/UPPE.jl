@@ -51,7 +51,7 @@ run!(simulation)
 
 
 # Compare to analytic solution:
-@unpack tu, Nt, t = grid
+(; tu, Nt, t) = grid
 
 zmax = model.zmax * model.zu
 k0 = k_func(w0)

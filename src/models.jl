@@ -38,7 +38,7 @@ function Model(
     grid::Grid{T}, field, response;
     zu=1, z=0, zmax, kparaxial=true, qparaxial=true, nonlinearity=true,
 ) where T
-    @unpack arch, Nt, w, wu = grid
+    (; arch, Nt, w, wu) = grid
 
     guard = Guard(grid, field)
 
@@ -87,8 +87,8 @@ end
 
 
 function KKpropagator(grid::GridT{T}, field, zu; paraxial=true) where T
-    @unpack Nt, w, wu = grid
-    @unpack w0 = field
+    (; Nt, w, wu) = grid
+    (; w0) = field
     vf = group_velocity(w0)   # frame velocity
     KK = zeros(ComplexF64, Nt)   # Float64 for higher precision
     for it=1:Nt
@@ -102,8 +102,8 @@ end
 
 
 function KKpropagator(grid::GridRT{T}, field, zu; paraxial=true) where T
-    @unpack Nr, Nt, k, ku, w, wu = grid
-    @unpack w0 = field
+    (; Nr, Nt, k, ku, w, wu) = grid
+    (; w0) = field
     vf = group_velocity(w0)   # frame velocity
     KK = zeros(ComplexF64, (Nr, Nt))   # Float64 for higher precision
     for it=1:Nt
@@ -140,8 +140,8 @@ end
 
 
 function QQpropagator(grid::GridT{T}, field, zu; paraxial=true) where T
-    @unpack Nt, w, wu = grid
-    @unpack Eu, w0 = field
+    (; Nt, w, wu) = grid
+    (; Eu) = field
     QQ = zeros(ComplexF64, Nt)   # Float64 for higher precision
     for it=1:Nt
         if w[it] > 0
@@ -153,8 +153,8 @@ end
 
 
 function QQpropagator(grid::GridRT{T}, field, zu; paraxial=true) where T
-    @unpack Nr, Nt, k, ku, w, wu = grid
-    @unpack Eu, w0 = field
+    (; Nr, Nt, k, ku, w, wu) = grid
+    (; Eu) = field
     QQ = zeros(ComplexF64, (Nr, Nt))   # Float64 for higher precision
     for it=1:Nt
         if w[it] > 0
@@ -181,9 +181,9 @@ end
 # ******************************************************************************
 function q_func!(dE, E, p, z)
     model, = p
-    @unpack QQ, QJ, field, response, guard = model
-    @unpack FFT = field
-    @unpack Pnl, J = response
+    (; QQ, QJ, field, response, guard) = model
+    (; FFT) = field
+    (; Pnl, J) = response
 
     frequency2time!(E, FFT)
 

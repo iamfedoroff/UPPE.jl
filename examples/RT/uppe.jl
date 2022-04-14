@@ -62,8 +62,8 @@ end
 
 
 function kerr_response(grid::Grid{T}, field, n2) where T
-    @unpack arch = grid
-    @unpack Eu, w0, E = field
+    (; arch) = grid
+    (; Eu, w0, E) = field
 
     chi3 = chi3_func(w0, n2)
     Rk = EPS0 * chi3 * Eu^3

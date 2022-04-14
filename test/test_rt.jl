@@ -67,7 +67,7 @@ run!(simulation)
 
 # Compare to analytic solution:
 E = collect(field.E)
-@unpack ru, tu, Nr, Nt, r, t = grid
+(; ru, tu, Nr, Nt, r, t) = grid
 
 zmax = model.zmax * model.zu
 k0 = k_func(w0)

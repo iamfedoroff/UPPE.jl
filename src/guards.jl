@@ -11,7 +11,7 @@ end
 
 
 function Guard(grid::GridT{T}, field) where T
-    @unpack arch, wu, t, w, tguard, wguard = grid
+    (; arch, wu, t, w, tguard, wguard) = grid
 
     Tguard = guard_window_both(t, tguard)
     Tguard = adapt_array(arch, Tguard)
@@ -47,8 +47,8 @@ end
 
 
 function Guard(grid::GridRT{T}, field) where T
-    @unpack arch, Nr, Nt, wu, ku, r, t, k, w = grid
-    @unpack rguard, tguard, kguard, wguard = grid
+    (; arch, Nr, Nt, wu, ku, r, t, k, w) = grid
+    (; rguard, tguard, kguard, wguard) = grid
 
     Rguard = guard_window_right(r, rguard)
     Rguard = adapt_array(arch, Rguard)

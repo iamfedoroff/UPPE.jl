@@ -17,7 +17,7 @@ end
 
 
 function FieldAnalyzer(grid::GridT{T}, z) where T
-    @unpack arch, Nt = grid
+    (; arch, Nt) = grid
     Imax, nemax, tau, F = [0 for i=1:4]
     I = adapt_array(arch, zeros(Nt))
     return FieldAnalyzerT{T}(z, Imax, nemax, tau, F, I)
@@ -25,9 +25,9 @@ end
 
 
 function analyze!(analyzer::FieldAnalyzerT, grid, field, response, z)
-    @unpack t, dt = grid
-    @unpack E = field
-    @unpack ne = response
+    (; t, dt) = grid
+    (; E) = field
+    (; ne) = response
 
     @. analyzer.I = abs2(E)
 
@@ -65,7 +65,7 @@ end
 
 
 function FieldAnalyzer(grid::GridRT{T}, z) where T
-    @unpack arch, Nr, Nt, r, dr = grid
+    (; arch, Nr, Nt, r, dr) = grid
     Imax, nemax, rad, tau, W = [0 for i=1:5]
     rdr = adapt_array(arch, r .* dr)
     Fr = adapt_array(arch, zeros(Nr))
@@ -76,9 +76,9 @@ end
 
 
 function analyze!(analyzer::FieldAnalyzerRT, grid, field, response, z)
-    @unpack r, t, dt = grid
-    @unpack E = field
-    @unpack ne = response
+    (; r, t, dt) = grid
+    (; E) = field
+    (; ne) = response
 
     analyzer.Fr .= vec(sum(abs2, E, dims=2)) * dt
     analyzer.Ft .= 2 * pi * vec(sum(abs2.(E) .* analyzer.rdr, dims=1))
