@@ -55,6 +55,7 @@ function OutputTXT(fname::String, grid::GridRT, field::FieldRT, neu, zu)
     plotvars = (
         PlotVar("z", "m", zu),
         PlotVar("Imax", "W/m^2", Iu),
+        PlotVar("Fmax", "J/m^2", tu * Iu),
         PlotVar("nemax", "1/m^3", neu),
         PlotVar("rad", "m", ru),
         PlotVar("tau", "s", tu),
@@ -66,11 +67,12 @@ end
 
 
 function write_txt(out::OutputTXT, analyzer::FieldAnalyzerRT)
-    (; z, Imax, nemax, rad, tau, W) = analyzer
+    (; z, Imax, Fmax, nemax, rad, tau, W) = analyzer
     fp = open(out.fname, "a")
     write(fp, "  ")
     @printf(fp, "%18.12e ", z)
     @printf(fp, "%18.12e ", Imax)
+    @printf(fp, "%18.12e ", Fmax)
     @printf(fp, "%18.12e ", nemax)
     @printf(fp, "%18.12e ", rad)
     @printf(fp, "%18.12e ", tau)

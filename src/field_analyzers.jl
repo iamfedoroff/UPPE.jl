@@ -52,6 +52,7 @@ mutable struct FieldAnalyzerRT{T} <: FieldAnalyzer
     # scalar variables:
     z :: T
     Imax :: T
+    Fmax :: T
     nemax :: T
     rad :: T
     tau :: T
@@ -67,13 +68,15 @@ end
 
 function FieldAnalyzer(grid::GridRT{T}, z) where T
     (; arch, Nr, Nt, r, dr) = grid
-    Imax, nemax, rad, tau, W = [0 for i=1:5]
+    Imax, Fmax, nemax, rad, tau, W = [0 for i=1:6]
     rdr = adapt_array(arch, r .* dr)
     Fr = adapt_array(arch, zeros(Nr))
     Ft = adapt_array(arch, zeros(Nt))
     Si = adapt_array(arch, zeros(Nt))
     ne = adapt_array(arch, zeros(Nr))
-    return FieldAnalyzerRT{T}(z, Imax, nemax, rad, tau, W, rdr, Fr, Ft, Si, ne)
+    return FieldAnalyzerRT{T}(
+        z, Imax, Fmax, nemax, rad, tau, W, rdr, Fr, Ft, Si, ne,
+    )
 end
 
 
@@ -94,6 +97,7 @@ function analyze!(analyzer::FieldAnalyzerRT, grid, field, response, z)
 
     analyzer.z = z
     analyzer.Imax = maximum(abs2, E)
+    analyzer.Fmax = maximum(analyzer.Fr)
     analyzer.nemax = maximum(ne)
     analyzer.rad = radius(r, collect(analyzer.Fr))
     analyzer.tau = radius(t, collect(analyzer.Ft))
