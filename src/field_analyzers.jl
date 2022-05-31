@@ -99,7 +99,7 @@ function analyze!(analyzer::FieldAnalyzerRT, grid, field, response, z)
     analyzer.Imax = maximum(abs2, E)
     analyzer.Fmax = maximum(analyzer.Fr)
     analyzer.nemax = maximum(ne)
-    analyzer.rad = radius(r, collect(analyzer.Fr))
+    analyzer.rad = 2 * radius(r, collect(analyzer.Fr))
     analyzer.tau = radius(t, collect(analyzer.Ft))
     analyzer.W = sum(analyzer.Ft) * dt
 
