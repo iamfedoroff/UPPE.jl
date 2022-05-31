@@ -83,7 +83,7 @@ function run!(simulation)
             zfirst = false
         end
 
-        if analyzer.Imax >= Icrit
+        if abs(analyzer.Imax) >= Icrit
             @warn "Imax >= Icrit"
             break
         end
